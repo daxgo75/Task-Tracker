@@ -22,7 +22,7 @@ class AuthController extends Controller
      *     path="/api/auth/login",
      *     tags={"Authentication"},
      *     summary="Login pengguna",
-     *     description="Autentikasi pengguna dengan email dan password. Mengembalikan Personal Access Token.",
+     *     description="Autentikasi pengguna dengan email dan password. Mengembalikan Personal Access Token dengan waktu ekspirasi.",
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -39,6 +39,7 @@ class AuthController extends Controller
      *             @OA\Property(property="message", type="string", example="Login berhasil."),
      *             @OA\Property(property="data", type="object",
      *                 @OA\Property(property="token", type="string", example="1|abc123..."),
+     *                 @OA\Property(property="expires_at", type="string", format="date-time", example="2025-03-07 12:34:56"),
      *                 @OA\Property(property="user", ref="#/components/schemas/UserResource")
      *             )
      *         )
@@ -49,17 +50,41 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
+        // Check if the account exists before attempting authentication
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user) {
+            return $this->error(
+                'Akun dengan email tersebut tidak ditemukan.',
+                401,
+                ['email' => ['Akun dengan email ini tidak ditemukan. Pastikan email yang Anda masukkan benar.']]
+            );
+        }
+
         if (! Auth::attempt($request->only('email', 'password'))) {
-            return $this->error('Email atau password yang Anda masukkan salah. Silakan coba lagi.', 401);
+            return $this->error(
+                'Password yang Anda masukkan salah.',
+                401,
+                ['password' => ['Password yang Anda masukkan salah. Silakan coba lagi.']]
+            );
         }
 
         /** @var User $user */
         $user  = Auth::user();
-        $token = $user->createToken('api-token')->plainTextToken;
+        $token = $user->createToken('api-token');
+
+        // Set token expiration time based on config
+        $expirationMinutes = (int) config('sanctum.expiration');
+        if ($expirationMinutes > 0) {
+            $token->accessToken->update([
+                'expires_at' => now()->addMinutes($expirationMinutes),
+            ]);
+        }
 
         return $this->success([
-            'token' => $token,
-            'user'  => new UserResource($user),
+            'token'        => $token->plainTextToken,
+            'expires_at'   => $token->accessToken->expires_at?->toDateTimeString(),
+            'user'         => new UserResource($user),
         ], 'Login berhasil.');
     }
 

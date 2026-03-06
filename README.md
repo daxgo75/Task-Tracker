@@ -1,47 +1,36 @@
-# Task Tracker — Backend API
+# Task Tracker — API Backend
 
-API backend untuk aplikasi manajemen project dan task, dibangun dengan **Laravel 12**, **PostgreSQL**, dan dilindungi dengan **Laravel Sanctum**.
-
----
-
-## Tech Stack
-
-| Layer     | Teknologi                               |
-| --------- | --------------------------------------- |
-| Framework | Laravel 12 (PHP 8.2+)                   |
-| Database  | PostgreSQL                              |
-| Auth      | Laravel Sanctum (Personal Access Token) |
-| Docs      | L5-Swagger (OpenAPI 3.0)                |
-| Testing   | PHPUnit 11                              |
+Sistem manajemen project dan task dengan **Laravel 12** dan **PostgreSQL**.
 
 ---
 
-## Prasyarat
+## 📋 Requirement
 
-- PHP 8.2+ dengan ekstensi: `pdo_pgsql`, `mbstring`, `openssl`, `tokenizer`, `xml`
-- Composer 2.x
-- PostgreSQL 14+
+Sebelum mulai, pastikan sudah install:
+
+- **PHP 8.2+** (dengan extension: `pdo_pgsql`, `mbstring`, `openssl`, `tokenizer`, `xml`)
+- **Composer** (package manager PHP)
+- **PostgreSQL 14+** (database)
 
 ---
 
-## Instalasi
+## 🚀 Instalasi (Setup Awal)
 
-### 1. Clone dan install dependensi
+### Step 1: Download dan Setup Project
 
 ```bash
-git clone <repo-url>
 cd Task-Tracker/backend
 composer install
 ```
 
-### 2. Konfigurasi Environment
+### Step 2: Setup File Environment
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-Edit `.env` dan sesuaikan:
+Edit file `.env` yang baru dibuat, ubah bagian database sesuai konfigurasi PostgreSQL Anda:
 
 ```env
 DB_CONNECTION=pgsql
@@ -50,314 +39,260 @@ DB_PORT=5432
 DB_DATABASE=task_tracker
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
-
-L5_SWAGGER_CONST_HOST=http://localhost:8000
-L5_SWAGGER_GENERATE_ALWAYS=true
 ```
 
-### 3. Buat database PostgreSQL
+### Step 3: Buat Database di PostgreSQL
+
+Buka PostgreSQL, kemudian jalankan:
 
 ```sql
 CREATE DATABASE task_tracker;
-CREATE DATABASE task_tracker_test;   -- untuk testing
-```
-
-### 4. Jalankan migrasi dan seeder
-
-```bash
-php artisan migrate --seed
-```
-
-Seeder akan membuat:
-
-- **Admin user**: `admin@tasktracker.com` / `password`
-- **8 kategori task**: Feature, Bug, Improvement, Research, Design, DevOps, Testing, Documentation
-
-### 5. Jalankan server
-
-```bash
-php artisan serve
-```
-
-API tersedia di: `http://localhost:8000`
-
----
-
-## Dokumentasi API (Swagger)
-
-Setelah server berjalan, buka:
-
-```
-http://localhost:8000/api/documentation
-```
-
-Atau generate ulang swagger docs:
-
-```bash
-php artisan l5-swagger:generate
-```
-
----
-
-## Endpoint Utama
-
-### Authentication
-
-| Method | Endpoint           | Deskripsi                |
-| ------ | ------------------ | ------------------------ |
-| POST   | `/api/auth/login`  | Login, mendapatkan token |
-| POST   | `/api/auth/logout` | Logout, revoke token     |
-| GET    | `/api/auth/me`     | Profil user yang login   |
-
-### Projects
-
-| Method | Endpoint                           | Deskripsi                      |
-| ------ | ---------------------------------- | ------------------------------ |
-| GET    | `/api/projects`                    | Daftar project (filter/search) |
-| POST   | `/api/projects`                    | Buat project baru              |
-| GET    | `/api/projects/{id}`               | Detail project + task list     |
-| PUT    | `/api/projects/{id}`               | Update project                 |
-| PATCH  | `/api/projects/{id}/toggle-status` | Toggle active/archived         |
-
-### Tasks
-
-| Method | Endpoint                   | Deskripsi                          |
-| ------ | -------------------------- | ---------------------------------- |
-| GET    | `/api/projects/{id}/tasks` | Task dalam project tertentu        |
-| POST   | `/api/projects/{id}/tasks` | Buat task dalam project            |
-| GET    | `/api/tasks`               | Semua task (lintas project/global) |
-| GET    | `/api/tasks/{id}`          | Detail task                        |
-| PUT    | `/api/tasks/{id}`          | Update task                        |
-| DELETE | `/api/tasks/{id}`          | Soft delete task                   |
-
-### Dashboard & Categories
-
-| Method | Endpoint          | Deskripsi                        |
-| ------ | ----------------- | -------------------------------- |
-| GET    | `/api/dashboard`  | Statistik ringkasan              |
-| GET    | `/api/categories` | Daftar kategori (untuk dropdown) |
-
----
-
-## Query Parameters
-
-### Projects
-
-- `?search=keyword` — Cari project berdasarkan nama
-- `?status=active|archived` — Filter berdasarkan status
-- `?per_page=15` — Jumlah data per halaman
-
-### Tasks
-
-- `?search=keyword` — Cari task berdasarkan judul
-- `?category_id=1` — Filter berdasarkan kategori
-- `?project_id=1` — Filter berdasarkan project (global endpoint)
-- `?per_page=20` — Jumlah data per halaman
-
----
-
-## Quick Start
-
-Untuk menjalankan project secara cepat:
-
-```bash
-# 1. Install
-composer install
-cp .env.example .env
-php artisan key:generate
-
-# 2. Setup database
-php artisan migrate --seed
-
-# 3. Run server
-php artisan serve
-
-# 4. Login dengan
-Email: admin@tasktracker.com
-Password: password
-
-# 5. Buka API docs
-http://localhost:8000/api/documentation
-```
-
----
-
-## Format Response
-
-Semua response menggunakan format JSON konsisten:
-
-```json
-{
-  "success": true,
-  "message": "Deskripsi pesan yang jelas",
-  "data": { ... }
-}
-```
-
-Error response:
-
-```json
-{
-    "success": false,
-    "message": "Penjelasan error yang deskriptif",
-    "errors": {
-        "field": ["Pesan validasi per field"]
-    }
-}
-```
-
----
-
-## Menjalankan Test
-
-Aplikasi memiliki 31 test cases dengan 90 assertions mencakup Authentication, Project Management, Task Management, dan Dashboard.
-
-### Setup database test
-
-```sql
 CREATE DATABASE task_tracker_test;
 ```
 
-### Jalankan semua test
+### Step 4: Setup Database (Migrasi & Seeder)
+
+```bash
+php artisan migrate --seed
+```
+
+**Apa yang terjadi:**
+
+- Membuat semua tabel database
+- Membuat akun admin default: `admin@tasktracker.com` / `password`
+- Membuat 5 kategori task otomatis
+
+✅ **Setup selesai!**
+
+---
+
+## ▶️ Menjalankan Aplikasi
+
+Cukup jalankan satu command:
+
+```bash
+php artisan serve
+```
+
+Tunggu sampai muncul:
+
+```
+Server running on [http://127.0.0.1:8000]
+```
+
+API server sudah berjalan di: **http://localhost:8000**
+
+---
+
+## 📚 Mengakses Dokumentasi API (Swagger)
+
+Setelah server berjalan, buka browser dan pergi ke:
+
+```
+http://localhost:8000/api/documentation
+```
+
+Di halaman ini Anda bisa:
+
+- 👀 **Lihat** semua endpoint API yang tersedia
+- 🧪 **Test** API langsung dari browser
+- 📖 **Baca** dokumentasi lengkap setiap endpoint
+- 🔐 **Setup** Bearer Token untuk test endpoint yang butuh autentikasi
+
+**Contoh Testing di Swagger:**
+
+1. Scroll ke `POST /api/auth/login`
+2. Click "Try it out"
+3. Masukkan:
+   ```json
+   {
+     "email": "admin@tasktracker.com",
+     "password": "password"
+   }
+   ```
+4. Click "Execute"
+5. Lihat response token
+6. Copy token, click tombol "Authorize" di atas halaman
+7. Paste token dengan format: `Bearer <token>`
+8. Sekarang Anda bisa test protected endpoints
+
+---
+
+## 🧪 Menjalankan Testing
+
+Aplikasi punya 31 test cases otomatis untuk memastikan semuanya jalan dengan baik.
+
+### Test Semua (Recommended)
 
 ```bash
 php artisan test --env=testing
 ```
 
-### Jalankan test per suite
+**Output yang diharapkan:**
 
-```bash
-php artisan test --testsuite=Feature --env=testing
-php artisan test --testsuite=Unit --env=testing
+```
+PASSED
+31 tests, 92 assertions
 ```
 
-### Jalankan test spesifik
+### Test File Spesifik (Opsional)
 
 ```bash
+# Test autentikasi
 php artisan test tests/Feature/AuthTest.php --env=testing
+
+# Test project management
 php artisan test tests/Feature/ProjectTest.php --env=testing
+
+# Test task management
 php artisan test tests/Feature/TaskTest.php --env=testing
+
+# Test dashboard
 php artisan test tests/Feature/DashboardTest.php --env=testing
 ```
 
-### Coverage report
-
-```bash
-php artisan test --coverage --env=testing
-```
+✅ Jika semua test **PASSED**, berarti aplikasi berjalan dengan baik!
 
 ---
 
-## Struktur Direktori
+## 📍 Endpoint Utama API
+
+### 🔐 Authentication
 
 ```
-app/
-├── Http/
-│   ├── Controllers/
-│   │   ├── AuthController.php      # Login, logout, me
-│   │   ├── ProjectController.php   # CRU project + toggle status
-│   │   ├── TaskController.php      # CRUD task + global list
-│   │   ├── DashboardController.php # Statistik dashboard
-│   │   └── CategoryController.php  # Daftar kategori
-│   ├── Requests/
-│   │   ├── LoginRequest.php
-│   │   ├── StoreProjectRequest.php
-│   │   ├── UpdateProjectRequest.php
-│   │   ├── StoreTaskRequest.php
-│   │   └── UpdateTaskRequest.php
-│   ├── Resources/
-│   │   ├── UserResource.php
-│   │   ├── CategoryResource.php
-│   │   ├── ProjectResource.php
-│   │   ├── ProjectBriefResource.php
-│   │   └── TaskResource.php
-│   └── Traits/
-│       └── ApiResponder.php        # Helper response JSON
-├── Models/
-│   ├── User.php
-│   ├── Category.php
-│   ├── Project.php
-│   └── Task.php
-database/
-├── migrations/
-│   ├── create_categories_table.php
-│   ├── create_projects_table.php
-│   └── create_tasks_table.php
-├── seeders/
-│   ├── AdminSeeder.php
-│   └── CategorySeeder.php
-└── factories/
-    ├── ProjectFactory.php
-    ├── TaskFactory.php
-    └── CategoryFactory.php
-routes/
-└── api.php
-tests/
-├── Feature/
-│   ├── AuthTest.php          # 7 test cases
-│   ├── ProjectTest.php       # 7 test cases
-│   ├── TaskTest.php          # 8 test cases
-│   └── DashboardTest.php     # 4 test cases
+POST   /api/auth/login   → Login, dapatkan token
+POST   /api/auth/logout  → Logout, hapus token
+GET    /api/auth/me      → Lihat profil user
 ```
+
+### 📁 Projects
+
+```
+GET    /api/projects              → Lihat semua project
+POST   /api/projects              → Buat project baru
+GET    /api/projects/{id}         → Lihat detail project
+PUT    /api/projects/{id}         → Edit project
+PATCH  /api/projects/{id}/toggle-status → Aktifkan/archive project
+```
+
+### ✅ Tasks
+
+```
+GET    /api/projects/{id}/tasks   → Lihat task di project
+POST   /api/projects/{id}/tasks   → Buat task baru
+GET    /api/tasks                 → Lihat semua task
+GET    /api/tasks/{id}            → Lihat detail task
+PUT    /api/tasks/{id}            → Edit task
+DELETE /api/tasks/{id}            → Hapus task
+```
+
+### 📊 Dashboard & Categories
+
+```
+GET    /api/dashboard   → Statistik ringkasan
+GET    /api/categories  → Lihat kategori task
+```
+
+### 🔍 Filter & Search (Query Parameters)
+
+**Projects:**
+
+- `?search=website` → Cari project nama "website"
+- `?status=active` → Lihat hanya project aktif
+- `?per_page=10` → Tampilkan 10 per halaman
+
+**Tasks:**
+
+- `?search=login` → Cari task judul "login"
+- `?category_id=1` → Filter kategori tertentu
+- `?per_page=20` → Tampilkan 20 per halaman
 
 ---
 
-## Desain Keputusan
+## 🔓 Akun Default
 
-### Soft Delete pada Task
-
-Task menggunakan custom soft delete dengan field `deleted_at` dan `deleted_by` (bukan Laravel `SoftDeletes` bawaan), sehingga kita dapat melacak **siapa** yang menghapus task tersebut.
-
-### Project tidak bisa dihapus
-
-Sesuai spesifikasi, project hanya bisa di-_toggle_ antara `active` dan `archived`. Tidak ada endpoint DELETE untuk project.
-
-### Status Task (Kanban)
-
-Task memiliki tiga status: `todo`, `in_progress`, `done` — dirancang untuk ditampilkan sebagai kolom Kanban board di frontend.
-
----
-
-## Kredensial Default (Seeder)
+Ketika seeding, otomatis dibuat satu admin account:
 
 | Field    | Value                 |
 | -------- | --------------------- |
 | Email    | admin@tasktracker.com |
 | Password | password              |
 
-## Learning Laravel
+Gunakan ini untuk login pertama kali di Swagger atau frontend.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 💾 Format Response API
 
-## Laravel Sponsors
+Semua response API menggunakan format JSON yang sama:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Success Response
 
-### Premium Partners
+```json
+{
+  "success": true,
+  "message": "Deskripsi pesan",
+  "data": {
+    "id": 1,
+    "name": "Project Name",
+    ...
+  }
+}
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Error Response
 
-## Contributing
+```json
+{
+  "success": false,
+  "message": "Penjelasan error",
+  "errors": {
+    "email": ["Email sudah terdaftar"],
+    "password": ["Password minimal 6 karakter"]
+  }
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## 📁 Struktur File Penting
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+backend/
+├── app/Http/Controllers/     # Logic endpoint API
+├── app/Models/               # Database models (User, Project, Task, Category)
+├── database/migrations/      # SQL table definitions
+├── database/seeders/         # Initial data setup
+├── routes/api.php            # Semua endpoint API
+└── tests/                    # Test cases
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## ❓ FAQ
 
-## License
+**Q: Bagaimana kalau lupa password?**  
+A: Ubah password di database, atau buat user baru dengan command:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan tinker
+>>> $user = User::create(['name' => 'Test', 'email' => 'test@example.com', 'password' => bcrypt('password'), 'is_admin' => false])
+>>> exit
+```
+
+**Q: Bagaimana cara generate ulang data (reset)?**  
+A: Hapus semua data dan buat ulang:
+
+```bash
+php artisan migrate:refresh --seed --env=testing
+```
+
+**Q: API error 500, apa yang salah?**  
+A: Lihat error di terminal atau run tests:
+
+```bash
+php artisan test --env=testing
+```
+
+**Q: Bagaimana update dokumentasi Swagger?**  
+A: Dokumentasi sudah berjalan di `/api/documentation`. Jika ada perubahan endpoint, file `public/api-docs.json` akan otomatis terupdate.

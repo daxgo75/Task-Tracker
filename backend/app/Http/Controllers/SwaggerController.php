@@ -35,8 +35,7 @@ namespace App\Http\Controllers;
  *     schema="CategoryResource",
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Feature"),
- *     @OA\Property(property="color", type="string", example="#6366f1")
+ *     @OA\Property(property="name", type="string", example="Feature")
  * )
  *
  * @OA\Schema(
@@ -55,11 +54,14 @@ namespace App\Http\Controllers;
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="project_id", type="integer", example=1),
+ *     @OA\Property(property="category_id", type="integer", example=1),
  *     @OA\Property(property="title", type="string", example="Implementasi Login"),
  *     @OA\Property(property="description", type="string"),
  *     @OA\Property(property="due_date", type="string", format="date", example="2025-12-31"),
- *     @OA\Property(property="status", type="string", enum={"todo","in_progress","done"}, example="todo"),
+ *     @OA\Property(property="category", ref="#/components/schemas/CategoryResource"),
+ *     @OA\Property(property="created_by", type="integer", example=1),
  *     @OA\Property(property="is_deleted", type="boolean", example=false),
+ *     @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true),
  *     @OA\Property(property="created_at", type="string", format="datetime"),
  *     @OA\Property(property="updated_at", type="string", format="datetime")
  * )

@@ -31,9 +31,12 @@ class AuthTest extends TestCase
             ->assertJsonStructure([
                 'success',
                 'message',
-                'data' => ['token', 'user' => ['id', 'name', 'email']],
+                'data' => ['token', 'expires_at', 'user' => ['id', 'name', 'email']],
             ])
             ->assertJson(['success' => true]);
+
+        // Verify token is a valid format (should have | separator)
+        $this->assertStringContainsString('|', $response['data']['token']);
     }
 
     public function test_login_fails_with_invalid_password(): void

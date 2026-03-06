@@ -1,0 +1,728 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Task Tracker API",
+    "version": "1.0.0",
+    "description": "API untuk manajemen project dan task. Autentikasi menggunakan Laravel Sanctum Personal Access Token."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "API Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "sanctum": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Masukkan token yang didapat dari endpoint /api/auth/login"
+      }
+    },
+    "schemas": {
+      "UserResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Admin"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@tasktracker.com"
+          },
+          "is_admin": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "CategoryResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Todo"
+          }
+        }
+      },
+      "ProjectResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Website Redesign"
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "archived"]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      },
+      "TaskResource": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "project_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "example": "Implementasi Login"
+          },
+          "description": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "category_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "category": {
+            "$ref": "#/components/schemas/CategoryResource"
+          },
+          "created_by": {
+            "type": "integer",
+            "example": 1
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "example": false
+          },
+          "deleted_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login pengguna",
+        "description": "Autentikasi pengguna dengan email dan password. Mengembalikan Personal Access Token dengan waktu ekspirasi.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "admin@tasktracker.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Login berhasil."
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": {
+                          "type": "string",
+                          "example": "1|abc123..."
+                        },
+                        "expires_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "example": "2025-03-07 12:34:56"
+                        },
+                        "user": {
+                          "$ref": "#/components/schemas/UserResource"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kredensial tidak valid"
+          },
+          "422": {
+            "description": "Validasi gagal"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout pengguna",
+        "description": "Mencabut (revoke) token aktif yang sedang digunakan.",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Logout berhasil"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Profil pengguna yang sedang login",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Data pengguna",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UserResource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/projects": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Daftar semua project",
+        "description": "Menampilkan semua project milik user Yang sedang login. Mendukung filter status dan pencarian judul.",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Cari project berdasarkan nama"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["active", "archived"]
+            },
+            "description": "Filter berdasarkan status"
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 15
+            },
+            "description": "Jumlah data per halaman"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar project berhasil diambil"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Projects"],
+        "summary": "Buat project baru",
+        "security": [{"sanctum": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "example": "Website Redesign"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "archived"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project berhasil dibuat"
+          },
+          "422": {
+            "description": "Validasi gagal"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/projects/{id}": {
+      "get": {
+        "tags": ["Projects"],
+        "summary": "Detail project beserta daftar task",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail project berhasil diambil"
+          },
+          "404": {
+            "description": "Project tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Projects"],
+        "summary": "Update informasi project",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "archived"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project berhasil diperbarui"
+          },
+          "404": {
+            "description": "Project tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/projects/{id}/toggle-status": {
+      "patch": {
+        "tags": ["Projects"],
+        "summary": "Toggle status project (active ↔ archived)",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status project berhasil diubah"
+          },
+          "404": {
+            "description": "Project tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Daftar semua kategori task",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Daftar kategori berhasil diambil"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": ["Dashboard"],
+        "summary": "Data ringkasan dashboard",
+        "security": [{"sanctum": []}],
+        "responses": {
+          "200": {
+            "description": "Data dashboard berhasil diambil"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/projects/{projectId}/tasks": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Daftar task dalam satu project",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar task berhasil diambil"
+          },
+          "404": {
+            "description": "Project tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tasks"],
+        "summary": "Buat task baru dalam project",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "category_id"],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "integer"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task berhasil dibuat"
+          },
+          "422": {
+            "description": "Validasi gagal"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Daftar semua task lintas project (global)",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Daftar task global berhasil diambil"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "get": {
+        "tags": ["Tasks"],
+        "summary": "Detail task",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detail task berhasil diambil"
+          },
+          "404": {
+            "description": "Task tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tasks"],
+        "summary": "Update task",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "category_id": {
+                    "type": "integer"
+                  },
+                  "due_date": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task berhasil diperbarui"
+          },
+          "404": {
+            "description": "Task tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tasks"],
+        "summary": "Soft delete task",
+        "security": [{"sanctum": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task berhasil dihapus"
+          },
+          "404": {
+            "description": "Task tidak ditemukan"
+          },
+          "401": {
+            "description": "Tidak terautentikasi"
+          }
+        }
+      }
+    }
+  }
+}
