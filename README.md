@@ -153,6 +153,7 @@ php artisan test tests/Feature/DashboardTest.php --env=testing
 
 ✅ Jika semua test **PASSED**, berarti aplikasi berjalan dengan baik!
 
+<<<<<<< HEAD
 ---
 
 ## 📍 Endpoint Utama API
@@ -296,3 +297,5 @@ php artisan test --env=testing
 
 **Q: Bagaimana update dokumentasi Swagger?**  
 A: Dokumentasi sudah berjalan di `/api/documentation`. Jika ada perubahan endpoint, file `public/api-docs.json` akan otomatis terupdate.
+=======
+>>>>>>> 6920f5842d28e0ef9e212f15bfea019c5c262bdd
