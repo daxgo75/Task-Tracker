@@ -153,149 +153,113 @@ php artisan test tests/Feature/DashboardTest.php --env=testing
 
 ✅ Jika semua test **PASSED**, berarti aplikasi berjalan dengan baik!
 
-<<<<<<< HEAD
 ---
 
-## 📍 Endpoint Utama API
+# Task Tracker — Frontend
 
-### 🔐 Authentication
-
-```
-POST   /api/auth/login   → Login, dapatkan token
-POST   /api/auth/logout  → Logout, hapus token
-GET    /api/auth/me      → Lihat profil user
-```
-
-### 📁 Projects
-
-```
-GET    /api/projects              → Lihat semua project
-POST   /api/projects              → Buat project baru
-GET    /api/projects/{id}         → Lihat detail project
-PUT    /api/projects/{id}         → Edit project
-PATCH  /api/projects/{id}/toggle-status → Aktifkan/archive project
-```
-
-### ✅ Tasks
-
-```
-GET    /api/projects/{id}/tasks   → Lihat task di project
-POST   /api/projects/{id}/tasks   → Buat task baru
-GET    /api/tasks                 → Lihat semua task
-GET    /api/tasks/{id}            → Lihat detail task
-PUT    /api/tasks/{id}            → Edit task
-DELETE /api/tasks/{id}            → Hapus task
-```
-
-### 📊 Dashboard & Categories
-
-```
-GET    /api/dashboard   → Statistik ringkasan
-GET    /api/categories  → Lihat kategori task
-```
-
-### 🔍 Filter & Search (Query Parameters)
-
-**Projects:**
-
-- `?search=website` → Cari project nama "website"
-- `?status=active` → Lihat hanya project aktif
-- `?per_page=10` → Tampilkan 10 per halaman
-
-**Tasks:**
-
-- `?search=login` → Cari task judul "login"
-- `?category_id=1` → Filter kategori tertentu
-- `?per_page=20` → Tampilkan 20 per halaman
+Antarmuka pengguna berbasis **Vue 3 + TypeScript** dengan **Vite** sebagai build tool.
 
 ---
 
-## 🔓 Akun Default
+## 📋 Requirement
 
-Ketika seeding, otomatis dibuat satu admin account:
+Sebelum mulai, pastikan sudah install:
 
-| Field    | Value                 |
-| -------- | --------------------- |
-| Email    | admin@tasktracker.com |
-| Password | password              |
-
-Gunakan ini untuk login pertama kali di Swagger atau frontend.
+- **Node.js 18+**
+- **npm 9+**
 
 ---
 
-## 💾 Format Response API
+## 🚀 Instalasi (Setup Awal)
 
-Semua response API menggunakan format JSON yang sama:
-
-### Success Response
-
-```json
-{
-  "success": true,
-  "message": "Deskripsi pesan",
-  "data": {
-    "id": 1,
-    "name": "Project Name",
-    ...
-  }
-}
-```
-
-### Error Response
-
-```json
-{
-  "success": false,
-  "message": "Penjelasan error",
-  "errors": {
-    "email": ["Email sudah terdaftar"],
-    "password": ["Password minimal 6 karakter"]
-  }
-}
-```
-
----
-
-## 📁 Struktur File Penting
-
-```
-backend/
-├── app/Http/Controllers/     # Logic endpoint API
-├── app/Models/               # Database models (User, Project, Task, Category)
-├── database/migrations/      # SQL table definitions
-├── database/seeders/         # Initial data setup
-├── routes/api.php            # Semua endpoint API
-└── tests/                    # Test cases
-```
-
----
-
-## ❓ FAQ
-
-**Q: Bagaimana kalau lupa password?**  
-A: Ubah password di database, atau buat user baru dengan command:
+### Step 1: Install Dependencies
 
 ```bash
-php artisan tinker
->>> $user = User::create(['name' => 'Test', 'email' => 'test@example.com', 'password' => bcrypt('password'), 'is_admin' => false])
->>> exit
+cd Task-Tracker/frontend
+npm install
 ```
 
-**Q: Bagaimana cara generate ulang data (reset)?**  
-A: Hapus semua data dan buat ulang:
+### Step 2: Setup File Environment
 
 ```bash
-php artisan migrate:refresh --seed --env=testing
+cp .env.example .env
 ```
 
-**Q: API error 500, apa yang salah?**  
-A: Lihat error di terminal atau run tests:
+Edit file `.env` sesuai URL backend yang berjalan:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000/api
+```
+
+---
+
+## ▶️ Menjalankan Aplikasi
 
 ```bash
-php artisan test --env=testing
+npm run dev
 ```
 
-**Q: Bagaimana update dokumentasi Swagger?**  
-A: Dokumentasi sudah berjalan di `/api/documentation`. Jika ada perubahan endpoint, file `public/api-docs.json` akan otomatis terupdate.
-=======
->>>>>>> 6920f5842d28e0ef9e212f15bfea019c5c262bdd
+Tunggu sampai muncul:
+
+```
+VITE ready in ... ms
+➜  Local:   http://localhost:5173/
+```
+
+Buka browser dan akses: **http://localhost:5173**
+
+**Login default:**
+
+```
+Email    : admin@tasktracker.com
+Password : password
+```
+
+---
+
+## 🏗️ Build untuk Production
+
+```bash
+npm run build
+```
+
+Hasil build tersimpan di folder `dist/`. Untuk preview hasil build:
+
+```bash
+npm run preview
+```
+
+---
+
+## 🧪 Menjalankan Testing
+
+Aplikasi punya **56 unit test** menggunakan Vitest dan Vue Test Utils.
+
+### Test Semua
+
+```bash
+npm run test
+```
+
+**Output yang diharapkan:**
+
+```
+✓ src/tests/LoginView.test.ts
+✓ src/tests/DashboardView.test.ts
+✓ src/tests/ProjectsView.test.ts
+✓ src/tests/TasksView.test.ts
+✓ src/tests/stores/projects.test.ts
+✓ src/tests/stores/globalTasks.test.ts
+✓ src/tests/plugins/date.test.ts
+
+Test Files  7 passed (7)
+Tests       56 passed (56)
+```
+
+### Type Check
+
+```bash
+npm run type-check
+```
+
+✅ Jika semua test **PASSED** dan type-check bersih, berarti frontend berjalan dengan baik!
