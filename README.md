@@ -1,19 +1,5 @@
 # Task Tracker — API Backend
 
-Sistem manajemen project dan task dengan **Laravel 12** dan **PostgreSQL**.
-
----
-
-## 📋 Requirement
-
-Sebelum mulai, pastikan sudah install:
-
-- **PHP 8.2+** (dengan extension: `pdo_pgsql`, `mbstring`, `openssl`, `tokenizer`, `xml`)
-- **Composer** (package manager PHP)
-- **PostgreSQL 14+** (database)
-
----
-
 ## 🚀 Instalasi (Setup Awal)
 
 ### Step 1: Download dan Setup Project
@@ -169,6 +155,7 @@ Sebelum mulai, pastikan sudah install:
 - **npm 9+**
 
 ---
+<<<<<<< HEAD
 
 ## 🚀 Instalasi (Setup Awal)
 
@@ -263,3 +250,5 @@ npm run type-check
 ```
 
 ✅ Jika semua test **PASSED** dan type-check bersih, berarti frontend berjalan dengan baik!
+=======
+>>>>>>> 6fdf535f2f28d05cf359b766dcc140df7769180e
